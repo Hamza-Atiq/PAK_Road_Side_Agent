@@ -1,0 +1,52 @@
+============================= test session starts =============================
+platform win32 -- Python 3.12.4, pytest-8.3.4, pluggy-1.6.0
+rootdir: D:\AI Journey\AMIR_KHAN_IDEAS\PAK_Road_Side_Agent
+configfile: pyproject.toml
+plugins: anyio-4.13.0, Faker-33.3.0, asyncio-0.25.2, cov-6.0.0, respx-0.22.0
+asyncio: mode=Mode.AUTO, asyncio_default_fixture_loop_scope=function
+collected 255 items
+
+tests\test_admin_agent.py .......................                        [  9%]
+tests\test_admin_api.py .........                                        [ 12%]
+tests\test_auth.py ...............                                       [ 18%]
+tests\test_celery_task.py .......                                        [ 21%]
+tests\test_communication.py ...........................                  [ 31%]
+tests\test_dispatch.py ............................                      [ 42%]
+tests\test_escalation.py ...............                                 [ 48%]
+tests\test_file_service.py .........                                     [ 52%]
+tests\test_guardrail.py ......................                           [ 60%]
+tests\test_incidents_api.py .............                                [ 65%]
+tests\test_jwt.py .......                                                [ 68%]
+tests\test_metrics.py ............                                       [ 73%]
+tests\test_metrics_endpoint.py ...                                       [ 74%]
+tests\test_monitoring_task.py ....                                       [ 76%]
+tests\test_orchestrator.py ......                                        [ 78%]
+tests\test_otp_dev.py ....                                               [ 80%]
+tests\test_phone.py ............                                         [ 84%]
+tests\test_providers_api.py .........                                    [ 88%]
+tests\test_security.py ......                                            [ 90%]
+tests\test_triage.py ...................                                 [ 98%]
+tests\test_webhooks.py .....                                             [100%]
+
+============================== warnings summary ===============================
+backend/tests/test_admin_api.py: 8 warnings
+backend/tests/test_auth.py: 2 warnings
+backend/tests/test_incidents_api.py: 13 warnings
+backend/tests/test_jwt.py: 5 warnings
+backend/tests/test_providers_api.py: 9 warnings
+  D:\AI Journey\AMIR_KHAN_IDEAS\PAK_Road_Side_Agent\.venv\Lib\site-packages\jose\jwt.py:311: DeprecationWarning: datetime.datetime.utcnow() is deprecated and scheduled for removal in a future version. Use timezone-aware objects to represent datetimes in UTC: datetime.datetime.now(datetime.UTC).
+    now = timegm(datetime.utcnow().utctimetuple())
+
+backend/tests/test_auth.py::test_otp_verify_activates_and_returns_tokens
+backend/tests/test_auth.py::test_login_succeeds_after_otp
+backend/tests/test_auth.py::test_login_wrong_password_unauthorized
+backend/tests/test_auth.py::test_me_returns_current_user
+backend/tests/test_auth.py::test_refresh_issues_new_access_token
+  D:\AI Journey\AMIR_KHAN_IDEAS\PAK_Road_Side_Agent\backend\app\api\auth.py:202: DeprecationWarning: datetime.datetime.utcnow() is deprecated and scheduled for removal in a future version. Use timezone-aware objects to represent datetimes in UTC: datetime.datetime.now(datetime.UTC).
+    user.updated_at = datetime.utcnow()
+
+backend/tests/test_incidents_api.py::test_admin_list_all
+  sys:1: SAWarning: SELECT statement has a cartesian product between FROM element(s) "incidents" and FROM element "anon_1".  Apply join condition(s) between each element to resolve.
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+================ 255 passed, 43 warnings in 602.69s (0:10:02) =================

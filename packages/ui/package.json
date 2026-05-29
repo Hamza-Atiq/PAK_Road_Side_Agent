@@ -1,0 +1,20 @@
+{
+  "name": "@roadside/ui",
+  "private": true,
+  "version": "0.1.0",
+  "description": "Shared design tokens, Tailwind config preset, and base React components used by apps/admin and apps/web.",
+  "main": "./src/index.ts",
+  "types": "./src/index.ts",
+  "exports": {
+    ".": "./src/index.ts",
+    "./tailwind-preset": "./tailwind-preset.cjs",
+    "./tokens": "./src/tokens.ts"
+  },
+  "scripts": {
+    "lint": "tsc --noEmit"
+  },
+  "peerDependencies": {
+    "react": "^18.0.0",
+    "tailwindcss": "^3.4.0"
+  }
+}

@@ -1,0 +1,59 @@
+# ============================================================
+# RoadSide Agent — Backend Dependencies (pinned, production-ready)
+# Python 3.12+
+# ============================================================
+
+# ---------- Web framework ----------
+fastapi[standard]==0.115.6
+uvicorn[standard]==0.34.0
+python-multipart==0.0.20
+websockets==14.1
+
+# ---------- Database ----------
+sqlalchemy[asyncio]==2.0.36
+asyncpg==0.30.0
+psycopg2-binary==2.9.10
+alembic==1.14.0
+geoalchemy2==0.16.0
+
+# ---------- Task queue ----------
+celery[redis]==5.4.0
+redis==5.2.1
+flower==2.0.1
+
+# ---------- AI / Agents ----------
+anthropic==0.42.0
+
+# ---------- External integrations ----------
+twilio==9.4.1
+httpx==0.28.1
+
+# ---------- Auth / Security ----------
+python-jose[cryptography]==3.3.0
+bcrypt==4.2.1
+passlib[bcrypt]==1.7.4
+slowapi==0.1.9
+cryptography==44.0.0
+
+# ---------- File / Input validation ----------
+python-magic==0.4.27
+python-magic-bin==0.4.14; sys_platform == "win32"
+phonenumbers==8.13.52
+Pillow==11.1.0
+
+# ---------- Configuration ----------
+pydantic==2.10.4
+pydantic-settings==2.7.1
+
+# ---------- Observability ----------
+prometheus-client==0.21.1
+structlog==24.4.0
+
+# ---------- Testing ----------
+pytest==8.3.4
+pytest-asyncio==0.25.2
+pytest-cov==6.0.0
+factory-boy==3.3.1
+faker==33.3.0
+respx==0.22.0
+locust==2.32.4

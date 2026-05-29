@@ -1,0 +1,40 @@
+[project]
+name = "roadside-agent"
+version = "0.1.0"
+description = "Fully agentic global roadside assistance platform — autonomous multi-agent system that diagnoses, dispatches, and tracks roadside incidents end-to-end."
+readme = "README.md"
+requires-python = ">=3.12"
+authors = [
+    { name = "Hamza Atiq", email = "hamzaatiq34@gmail.com" }
+]
+license = { text = "Proprietary" }
+keywords = ["roadside-assistance", "agentic-ai", "claude", "fastapi", "postgis"]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Programming Language :: Python :: 3.12",
+    "Framework :: FastAPI",
+    "Operating System :: OS Independent",
+]
+dependencies = []
+
+[project.urls]
+Repository = "https://github.com/hamzaatiq/roadside-agent"
+
+[tool.ruff]
+line-length = 100
+target-version = "py312"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "N", "W", "UP", "B", "A", "C4", "SIM", "ASYNC"]
+ignore = ["E501"]
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+# Function scope — pytest-asyncio 0.25 has no per-test default loop scope ini
+# option (that arrived in a later version), so tests run on per-test loops.
+# To stay consistent, fixtures also run per-test; conftest creates a fresh
+# async engine per test (cheap) and bootstraps the schema only once via a
+# module-level guard.
+asyncio_default_fixture_loop_scope = "function"
+testpaths = ["backend/tests"]
+pythonpath = ["backend"]

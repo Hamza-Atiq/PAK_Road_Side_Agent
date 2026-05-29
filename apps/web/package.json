@@ -1,0 +1,9 @@
+{
+  "name": "@roadside/web",
+  "private": true,
+  "version": "0.1.0",
+  "description": "Unified customer+provider web app (Vercel) — scaffolded in Week 2.",
+  "scripts": {
+    "dev": "echo 'apps/web — not yet scaffolded. See V2_PLAN.md Week 2.' && exit 0"
+  }
+}

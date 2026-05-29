@@ -1,0 +1,22 @@
+{
+  "name": "roadside-agent",
+  "version": "2.0.0",
+  "private": true,
+  "description": "RoadSide Agent — fully-agentic roadside assistance platform.",
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "dev:admin": "npm --workspace apps/admin run dev",
+    "dev:web": "npm --workspace apps/web run dev",
+    "build:admin": "npm --workspace apps/admin run build",
+    "build:web": "npm --workspace apps/web run build",
+    "build": "npm run build:admin --if-present && npm run build:web --if-present",
+    "lint": "npm run lint --workspaces --if-present"
+  },
+  "engines": {
+    "node": ">=20.0.0",
+    "npm": ">=10.0.0"
+  }
+}

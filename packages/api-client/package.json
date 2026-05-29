@@ -1,0 +1,18 @@
+{
+  "name": "@roadside/api-client",
+  "private": true,
+  "version": "0.1.0",
+  "description": "Generated TypeScript client for the FastAPI backend. Consumed by apps/admin and apps/web. Flutter mobile generates its own Dart client from the same OpenAPI schema.",
+  "main": "./src/index.ts",
+  "types": "./src/index.ts",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "generate": "echo 'Will run openapi-typescript against http://localhost:8000/openapi.json in Week 1 finish' && exit 0",
+    "lint": "tsc --noEmit"
+  },
+  "peerDependencies": {
+    "axios": "^1.7.0"
+  }
+}

@@ -1,0 +1,44 @@
+# ============================================================
+# RoadSide Agent — Prometheus alert rules
+# Per SPEC §10. Wired up in Phase 12.
+# ============================================================
+
+groups:
+  - name: roadside_alerts
+    rules:
+
+      - alert: CeleryQueueBacklog
+        expr: celery_queue_length{queue="incidents"} > 20
+        for: 2m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Incident queue backlog"
+          description: "{{ $value }} tasks pending on the incidents queue for over 2 minutes."
+
+      - alert: HighAgentErrorRate
+        expr: rate(agent_errors_total[5m]) > 0.1
+        for: 1m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Elevated agent error rate"
+          description: "Agent {{ $labels.agent_name }} error rate is {{ $value }}/sec over 5 min."
+
+      - alert: SMSDeliveryDegraded
+        expr: (rate(sms_failures_total[10m]) / clamp_min(rate(sms_sent_total[10m]), 0.001)) > 0.05
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "SMS failure rate above 5%"
+          description: "Twilio delivery failures are above the 5% threshold for the past 5 minutes."
+
+      - alert: IncidentProcessingSlowdown
+        expr: histogram_quantile(0.95, rate(incident_processing_seconds_bucket[5m])) > 15
+        for: 3m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Incident processing p95 > 15s"
+          description: "95th percentile of REPORTED → ASSIGNED latency is over 15 seconds."

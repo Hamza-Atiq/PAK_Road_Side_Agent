@@ -1,0 +1,106 @@
+# ---------- Python ----------
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+dist/
+wheels/
+*.egg-info/
+*.egg
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+.tox/
+.nox/
+*.cover
+*.log
+
+# ---------- Virtual environments ----------
+.venv/
+venv/
+env/
+ENV/
+
+# ---------- Environment files (secrets) ----------
+.env
+.env.local
+.env.*.local
+*.pem
+*.key
+
+# ---------- Node / Frontend ----------
+node_modules/
+dist/
+build/
+.vite/
+.next/
+.nuxt/
+.cache/
+*.tsbuildinfo
+.parcel-cache/
+.eslintcache
+
+# ---------- IDE / Editor ----------
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+Thumbs.db
+*.sublime-*
+
+# ---------- OS ----------
+.DS_Store
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+
+# ---------- Project-specific ----------
+uploads/
+*.sqlite
+*.sqlite3
+*.db
+celerybeat-schedule
+celerybeat.pid
+dump.rdb
+
+# ---------- Docker ----------
+docker-compose.override.yml
+
+# ---------- Backups ----------
+*.bak
+*.backup
+*.sql.gz
+
+# ---------- Claude / Local config ----------
+CLAUDE.md
+CHECKLIST.md
+SCOPE.md
+SPEC.md
+PRD.md
+DEMO.md
+DEPLOYMENT.md
+V2_PLAN.md
+.claude/
+
+# ---------- Monorepo (v2) ----------
+# Flutter mobile (apps/mobile)
+apps/mobile/.dart_tool/
+apps/mobile/.flutter-plugins
+apps/mobile/.flutter-plugins-dependencies
+apps/mobile/build/
+apps/mobile/ios/Pods/
+apps/mobile/ios/.symlinks/
+apps/mobile/android/.gradle/
+apps/mobile/android/local.properties
+*.iml
+# Turbo/Nx caches if added later
+.turbo/
+.nx/
+# v1 frontends temporarily duplicated under frontend/ while VS Code holds locks
+# — safe to delete frontend/ once VS Code is closed (see archive/v1-frontend/ for backup)

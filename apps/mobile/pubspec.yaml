@@ -1,0 +1,62 @@
+name: roadside_mobile
+description: RoadSide — customer mobile app (Flutter).
+publish_to: "none"
+version: 0.1.0+1
+
+environment:
+  sdk: ">=3.4.0 <4.0.0"
+  flutter: ">=3.22.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+  # State + DI
+  flutter_riverpod: ^2.5.1
+
+  # Routing
+  go_router: ^14.2.0
+
+  # Networking
+  dio: ^5.4.3+1
+  web_socket_channel: ^3.0.1
+
+  # Storage
+  flutter_secure_storage: ^9.2.2
+  shared_preferences: ^2.2.3
+
+  # Location + GPS
+  geolocator: ^13.0.1
+  permission_handler: ^11.3.1
+
+  # Camera + media
+  image_picker: ^1.1.2
+  record: ^5.1.2
+
+  # Push (FCM for Android + iOS via APNs bridge)
+  firebase_core: ^3.3.0
+  firebase_messaging: ^15.0.4
+
+  # Map (OSM tiles, free)
+  flutter_map: ^7.0.2
+  latlong2: ^0.9.1
+
+  # Misc
+  intl: ^0.19.0
+  cupertino_icons: ^1.0.8
+  url_launcher: ^6.3.0
+
+  # Social sign-on (Apple required for App Store; Google + Facebook for parity)
+  sign_in_with_apple: ^6.1.1
+  google_sign_in: ^6.2.1
+  flutter_facebook_auth: ^7.0.1
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^4.0.0
+
+flutter:
+  uses-material-design: true
+  assets:
+    - assets/images/

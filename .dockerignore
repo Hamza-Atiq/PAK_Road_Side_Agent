@@ -1,0 +1,61 @@
+# Top-level dockerignore for monorepo. Backend Dockerfile only needs backend/.
+# Trim everything else to keep Railway builds fast.
+
+# Repo metadata
+.git
+.gitignore
+.vscode
+.idea
+*.iml
+.DS_Store
+Thumbs.db
+
+# Docs (planning + private — kept local, not shipped)
+CLAUDE.md
+CHECKLIST.md
+SCOPE.md
+SPEC.md
+PRD.md
+DEMO.md
+DEPLOYMENT.md
+V2_PLAN.md
+README.md
+
+# Frontends (not built into backend image)
+apps/
+packages/
+frontend/
+archive/
+node_modules/
+package.json
+package-lock.json
+pnpm-lock.yaml
+pnpm-workspace.yaml
+
+# Python local
+.venv/
+venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# Build artifacts
+dist/
+build/
+
+# Env
+.env
+.env.*
+
+# Uploads / data dumps
+uploads/
+*.sqlite
+*.sqlite3
+*.db
+celerybeat-schedule
+dump.rdb
+
+# Test logs
+*.log

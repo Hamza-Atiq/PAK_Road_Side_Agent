@@ -21,6 +21,4 @@ final incidentsServiceProvider = Provider<IncidentsService>((ref) {
 
 /// Current user, null when signed out. Refreshed via [AuthController].
 final authUserProvider =
-    StateNotifierProvider<AuthController, AuthUserState>((ref) {
-  return AuthController(ref.watch(authServiceProvider));
-});
+    NotifierProvider<AuthController, AuthUserState>(AuthController.new);

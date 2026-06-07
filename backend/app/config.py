@@ -64,6 +64,11 @@ class Settings(BaseSettings):
     TWILIO_VERIFY_SERVICE_SID: str = ""
     TWILIO_CALLBACK_BASE_URL: str = ""
 
+    # ---------- Test-mode OTP bypass ----------
+    # Comma-separated E.164 numbers that skip Twilio and accept DEV_OTP_CODE.
+    # Used for QA, App Store reviewers, and countries Twilio can't reach.
+    TEST_PHONE_NUMBERS: str = ""
+
     # ---------- File uploads ----------
     UPLOAD_DIR: str = "./uploads"
     MAX_UPLOAD_MB: int = 10
@@ -112,6 +117,10 @@ class Settings(BaseSettings):
     @property
     def cors_origins(self) -> list[str]:
         return [o.strip() for o in self.CORS_ORIGINS.split(",") if o.strip()]
+
+    @property
+    def test_phone_numbers(self) -> set[str]:
+        return {p.strip() for p in self.TEST_PHONE_NUMBERS.split(",") if p.strip()}
 
     @property
     def max_upload_bytes(self) -> int:

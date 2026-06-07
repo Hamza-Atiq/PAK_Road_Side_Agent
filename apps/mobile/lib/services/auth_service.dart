@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../models/models.dart';
 import 'api_client.dart';
+import 'providers.dart';
 
 class AuthService {
   AuthService(this._api);
@@ -80,12 +81,15 @@ class AuthUserState {
       );
 }
 
-class AuthController extends StateNotifier<AuthUserState> {
-  AuthController(this._svc) : super(const AuthUserState(loading: true)) {
-    _bootstrap();
-  }
+class AuthController extends Notifier<AuthUserState> {
+  late final AuthService _svc;
 
-  final AuthService _svc;
+  @override
+  AuthUserState build() {
+    _svc = ref.read(authServiceProvider);
+    _bootstrap();
+    return const AuthUserState(loading: true);
+  }
 
   Future<void> _bootstrap() async {
     final me = await _svc.me();

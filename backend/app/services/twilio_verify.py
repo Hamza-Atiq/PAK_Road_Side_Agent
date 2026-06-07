@@ -53,7 +53,17 @@ async def send_otp(phone: str, channel: Literal["sms", "whatsapp"] = "sms") -> N
     """Trigger an OTP to the given E.164 phone number.
 
     In dev fallback mode this is a no-op (logs a warning instead).
+    Numbers in settings.test_phone_numbers also skip Twilio and accept
+    DEV_OTP_CODE — used for QA and App Store review accounts.
     """
+    if phone in settings.test_phone_numbers:
+        log.warning(
+            "TEST NUMBER %s — skipping Twilio. Use code %s to verify.",
+            phone,
+            DEV_OTP_CODE,
+        )
+        return
+
     if _is_dev_fallback():
         log.warning(
             "DEV MODE OTP — Twilio Verify not configured. "
@@ -79,6 +89,15 @@ async def send_otp(phone: str, channel: Literal["sms", "whatsapp"] = "sms") -> N
 
 async def check_otp(phone: str, code: str) -> bool:
     """Verify the OTP code submitted by the user. Returns True if approved."""
+    if phone in settings.test_phone_numbers:
+        approved = code == DEV_OTP_CODE
+        log.warning(
+            "TEST NUMBER check for %s: %s",
+            phone,
+            "approved" if approved else "rejected",
+        )
+        return approved
+
     if _is_dev_fallback():
         approved = code == DEV_OTP_CODE
         log.warning(

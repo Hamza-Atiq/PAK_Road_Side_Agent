@@ -3,7 +3,9 @@ builder = "DOCKERFILE"
 dockerfilePath = "Dockerfile.railway"
 
 [deploy]
-healthcheckPath = "/health"
-healthcheckTimeout = 30
+# No healthcheckPath here — the API service gets /health probed via Railway's
+# service-level override; worker and beat run Celery (no HTTP port) so they
+# must not have an HTTP healthcheck.  The Dockerfile HEALTHCHECK instruction
+# handles container-level health for all three roles via SERVICE_ROLE.
 restartPolicyType = "ON_FAILURE"
 restartPolicyMaxRetries = 5

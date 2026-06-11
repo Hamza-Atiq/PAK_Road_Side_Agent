@@ -12,6 +12,7 @@ import os
 from typing import Annotated
 
 from fastapi import APIRouter, Depends, Header, HTTPException, status
+from pydantic import BaseModel
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -28,8 +29,18 @@ _ADMIN_EMAIL = "admin@roadside.test"
 _ADMIN_PASS  = "admin123"
 
 
+class SetupRequest(BaseModel):
+    force_reset: bool = False
+
+
+class ResetUserRequest(BaseModel):
+    phone: str
+    new_password: str = "Reset1234!"
+
+
 @router.post("/admin", status_code=201, summary="Bootstrap first admin (one-time use)")
 async def bootstrap_admin(
+    payload: SetupRequest,
     db: Annotated[AsyncSession, Depends(get_db)],
     x_setup_secret: Annotated[str | None, Header()] = None,
 ) -> dict:
@@ -41,7 +52,13 @@ async def bootstrap_admin(
 
     existing = await db.scalar(select(User).where(User.role == UserRole.admin.value))
     if existing:
-        return {"created": False, "admin_id": str(existing.id), "message": "admin already exists"}
+        if payload.force_reset:
+            existing.password_hash = hash_password(_ADMIN_PASS)
+            existing.is_active = True
+            existing.is_phone_verified = True
+            await db.commit()
+            return {"created": False, "reset": True, "admin_id": str(existing.id), "phone": existing.phone, "password": _ADMIN_PASS}
+        return {"created": False, "admin_id": str(existing.id), "phone": existing.phone, "message": "admin exists — use force_reset=true to reset password"}
 
     admin = User(
         phone=_ADMIN_PHONE,
@@ -55,3 +72,26 @@ async def bootstrap_admin(
     db.add(admin)
     await db.commit()
     return {"created": True, "admin_id": str(admin.id), "phone": _ADMIN_PHONE, "password": _ADMIN_PASS}
+
+
+@router.post("/reset-user", status_code=200, summary="Reset any user's password (one-time use)")
+async def reset_user_password(
+    payload: ResetUserRequest,
+    db: Annotated[AsyncSession, Depends(get_db)],
+    x_setup_secret: Annotated[str | None, Header()] = None,
+) -> dict:
+    secret = os.environ.get("ADMIN_SETUP_SECRET", "")
+    if not secret:
+        raise HTTPException(status_code=404, detail="not found")
+    if x_setup_secret != secret:
+        raise HTTPException(status_code=403, detail="invalid secret")
+
+    user = await db.scalar(select(User).where(User.phone == payload.phone))
+    if user is None:
+        raise HTTPException(status_code=404, detail=f"no user with phone {payload.phone}")
+
+    user.password_hash = hash_password(payload.new_password)
+    user.is_active = True
+    user.is_phone_verified = True
+    await db.commit()
+    return {"user_id": str(user.id), "phone": user.phone, "name": user.name, "role": user.role, "new_password": payload.new_password}

@@ -132,6 +132,13 @@ async def send_sms(*, to: str, body: str) -> TwilioSendResult:
     if not to or not body:
         raise TwilioSendError("to and body are required")
 
+    # Test-number bypass — same list used by OTP bypass; avoids trial-account 21608 errors.
+    if to in settings.test_phone_numbers:
+        sid = _dev_fake_sid()
+        log.warning("twilio_test_number_skipped", channel="sms", to=to, sid=sid, preview=body[:80])
+        record_sms("sms", success=True)
+        return TwilioSendResult(twilio_sid=sid, status="test_skipped", channel="sms")
+
     if _is_dev_fallback():
         sid = _dev_fake_sid()
         log.warning("twilio_dev_skipped", channel="sms", to=to, sid=sid, preview=body[:80])
@@ -154,6 +161,13 @@ async def send_whatsapp(*, to: str, body: str) -> TwilioSendResult:
     """Send a WhatsApp message asynchronously."""
     if not to or not body:
         raise TwilioSendError("to and body are required")
+
+    # Test-number bypass — avoids trial-account failures on unverified numbers.
+    if to in settings.test_phone_numbers:
+        sid = _dev_fake_sid()
+        log.warning("twilio_test_number_skipped", channel="whatsapp", to=to, sid=sid, preview=body[:80])
+        record_sms("whatsapp", success=True)
+        return TwilioSendResult(twilio_sid=sid, status="test_skipped", channel="whatsapp")
 
     if _is_dev_fallback():
         sid = _dev_fake_sid()

@@ -36,11 +36,19 @@ USER 1001
 
 EXPOSE 8000
 
+# SERVICE_ROLE controls which process runs:
+#   api (default) — Uvicorn HTTP server
+#   worker        — Celery task worker
+#   beat          — Celery periodic scheduler
+# Healthcheck is only meaningful for the api role; worker/beat skip it.
 HEALTHCHECK --interval=30s --timeout=5s --start-period=15s --retries=3 \
-  CMD curl -f http://127.0.0.1:${PORT}/health || exit 1
+  CMD if [ "${SERVICE_ROLE:-api}" = "api" ]; then curl -f http://127.0.0.1:${PORT}/health || exit 1; else exit 0; fi
 
-# Default = web (api service). Override per Railway service:
-#   api:    uvicorn app.main:app --host 0.0.0.0 --port $PORT --workers 4
-#   worker: celery -A celery_worker worker --loglevel=info --concurrency=4 -Q incidents,notifications,monitoring
-#   beat:   celery -A celery_worker beat --loglevel=info
-CMD ["sh", "-c", "uvicorn app.main:app --host 0.0.0.0 --port ${PORT:-8000} --workers ${WEB_CONCURRENCY:-4}"]
+CMD ["sh", "-c", "\
+  if [ \"${SERVICE_ROLE:-api}\" = \"worker\" ]; then \
+    exec celery -A celery_worker worker --loglevel=info --concurrency=4 -Q incidents,notifications,monitoring; \
+  elif [ \"${SERVICE_ROLE:-api}\" = \"beat\" ]; then \
+    exec celery -A celery_worker beat --loglevel=info; \
+  else \
+    exec uvicorn app.main:app --host 0.0.0.0 --port ${PORT:-8000} --workers ${WEB_CONCURRENCY:-4}; \
+  fi"]

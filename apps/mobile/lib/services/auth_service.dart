@@ -12,19 +12,18 @@ class AuthService {
   final ApiClient _api;
 
   /// POST /api/auth/register. Server sends OTP via SMS.
-  Future<String> register({
+  Future<void> register({
     required String phone,
     required String name,
     required String password,
     String role = 'customer',
   }) async {
-    final r = await _api.dio.post('/api/auth/register', data: {
+    await _api.dio.post('/api/auth/register', data: {
       'phone': phone,
       'name': name,
       'password': password,
       'role': role,
     });
-    return r.data['user_id'] as String;
   }
 
   /// POST /api/auth/verify-otp → access_token + user.

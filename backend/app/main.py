@@ -25,6 +25,7 @@ from app.api import admin as admin_router
 from app.api import auth as auth_router
 from app.api import incidents as incidents_router
 from app.api import providers as providers_router
+from app.api import setup as setup_router
 from app.api import webhooks as webhooks_router
 from app.api import ws as ws_router
 from app.config import settings
@@ -98,6 +99,7 @@ def create_app() -> FastAPI:
     app.include_router(incidents_router.router)
     app.include_router(providers_router.router)
     app.include_router(ws_router.router)
+    app.include_router(setup_router.router)
 
     # ---------- Static uploads ----------
     upload_dir = Path(settings.UPLOAD_DIR).resolve()

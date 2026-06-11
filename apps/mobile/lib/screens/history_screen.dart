@@ -6,6 +6,15 @@ import '../models/models.dart';
 import '../services/providers.dart';
 import '../theme/colors.dart';
 
+const _serviceLabels = {
+  'tow': 'Tow',
+  'battery': 'Battery / Jump Start',
+  'tire': 'Flat Tire',
+  'fuel': 'Out of Fuel',
+  'lockout': 'Lockout',
+  'other': 'Other Issue',
+};
+
 class HistoryScreen extends ConsumerStatefulWidget {
   const HistoryScreen({super.key});
 
@@ -57,7 +66,7 @@ class _HistoryScreenState extends ConsumerState<HistoryScreen> {
                         itemBuilder: (_, i) {
                           final inc = _items![i];
                           return InkWell(
-                            onTap: () => context.go('/incidents/${inc.id}'),
+                            onTap: () => context.push('/incidents/${inc.id}'),
                             borderRadius: BorderRadius.circular(12),
                             child: Container(
                               padding: const EdgeInsets.all(14),
@@ -73,7 +82,7 @@ class _HistoryScreenState extends ConsumerState<HistoryScreen> {
                                       crossAxisAlignment: CrossAxisAlignment.start,
                                       children: [
                                         Text(
-                                          inc.serviceType ?? 'Incident',
+                                          _serviceLabels[inc.serviceType] ?? inc.serviceType ?? 'Incident',
                                           style: const TextStyle(
                                               fontWeight: FontWeight.w700, fontSize: 15),
                                         ),

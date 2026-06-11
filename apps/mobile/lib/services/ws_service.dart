@@ -1,8 +1,8 @@
-// WebSocket subscription for live incident updates.
+// WebSocket subscription for live incident updates with auto-reconnect.
 //
-// Backend protocol mirrors @roadside/api-client connectWS: bearer token sent
-// as query param `?token=...` because WS spec doesn't allow custom headers in
-// browsers. Mobile follows the same convention for parity.
+// Bearer token is passed as query param `?token=...` because WS spec doesn't
+// allow custom headers. Reconnects with exponential backoff (1s, 2s, 4s, 8s…
+// up to 30s) whenever the connection drops unexpectedly.
 
 import 'dart:async';
 import 'dart:convert';
@@ -12,11 +12,18 @@ import 'package:web_socket_channel/web_socket_channel.dart';
 import '../config.dart';
 
 class IncidentWsHandle {
-  IncidentWsHandle._(this._channel, this.stream);
-  final WebSocketChannel _channel;
-  final Stream<Map<String, dynamic>> stream;
+  IncidentWsHandle._(this._controller);
+  final StreamController<Map<String, dynamic>> _controller;
+  bool _closed = false;
 
-  Future<void> close() async => _channel.sink.close();
+  Stream<Map<String, dynamic>> get stream => _controller.stream;
+
+  Future<void> close() async {
+    _closed = true;
+    await _controller.close();
+  }
+
+  bool get isClosed => _closed;
 }
 
 class WsService {
@@ -24,19 +31,65 @@ class WsService {
     required String incidentId,
     required String accessToken,
   }) {
+    final controller = StreamController<Map<String, dynamic>>.broadcast();
+    final handle = IncidentWsHandle._(controller);
+    _connect(incidentId, accessToken, handle, controller, 1);
+    return handle;
+  }
+
+  static void _connect(
+    String incidentId,
+    String accessToken,
+    IncidentWsHandle handle,
+    StreamController<Map<String, dynamic>> controller,
+    int delaySecs,
+  ) {
+    if (handle.isClosed) return;
+
     final uri = Uri.parse(
         '${RsConfig.wsBaseUrl}/ws/incidents/$incidentId?token=$accessToken');
-    final channel = WebSocketChannel.connect(uri);
-    final stream = channel.stream.map((raw) {
-      if (raw is String) {
+    WebSocketChannel? channel;
+    try {
+      channel = WebSocketChannel.connect(uri);
+    } catch (_) {
+      _scheduleReconnect(incidentId, accessToken, handle, controller, delaySecs);
+      return;
+    }
+
+    channel.stream.listen(
+      (raw) {
+        if (handle.isClosed) return;
         try {
-          return jsonDecode(raw) as Map<String, dynamic>;
-        } catch (_) {
-          return <String, dynamic>{'raw': raw};
+          final msg = raw is String
+              ? jsonDecode(raw) as Map<String, dynamic>
+              : <String, dynamic>{'raw': raw.toString()};
+          controller.add(msg);
+        } catch (_) {}
+      },
+      onError: (_) {
+        _scheduleReconnect(incidentId, accessToken, handle, controller, delaySecs);
+      },
+      onDone: () {
+        // Reconnect unless the handle was deliberately closed
+        if (!handle.isClosed) {
+          _scheduleReconnect(incidentId, accessToken, handle, controller, delaySecs);
         }
-      }
-      return <String, dynamic>{'raw': raw.toString()};
-    }).asBroadcastStream();
-    return IncidentWsHandle._(channel, stream);
+      },
+      cancelOnError: true,
+    );
+  }
+
+  static void _scheduleReconnect(
+    String incidentId,
+    String accessToken,
+    IncidentWsHandle handle,
+    StreamController<Map<String, dynamic>> controller,
+    int delaySecs,
+  ) {
+    if (handle.isClosed) return;
+    final next = delaySecs > 30 ? 30 : delaySecs;
+    Future.delayed(Duration(seconds: next), () {
+      _connect(incidentId, accessToken, handle, controller, next * 2);
+    });
   }
 }

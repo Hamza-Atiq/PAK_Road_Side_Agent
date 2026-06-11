@@ -2,9 +2,12 @@
 // WS /ws/incidents/:id. Renders status stepper, flutter_map with two pins
 // (you = red, provider = orange), and a provider card with tap-to-call.
 
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -25,6 +28,11 @@ class _IncidentStatusScreenState extends ConsumerState<IncidentStatusScreen> {
   Incident? _incident;
   String? _error;
   IncidentWsHandle? _ws;
+  Timer? _pollTimer;
+  bool _cancelling = false;
+
+  static const _cancellableStatuses = {'REPORTED', 'ANALYZING', 'NO_PROVIDER'};
+  static const _terminalStatuses = {'COMPLETED', 'CLOSED'};
 
   @override
   void initState() {
@@ -35,6 +43,7 @@ class _IncidentStatusScreenState extends ConsumerState<IncidentStatusScreen> {
   @override
   void dispose() {
     _ws?.close();
+    _pollTimer?.cancel();
     super.dispose();
   }
 
@@ -44,8 +53,56 @@ class _IncidentStatusScreenState extends ConsumerState<IncidentStatusScreen> {
       if (!mounted) return;
       setState(() => _incident = inc);
       await _connectWs();
+      _startPolling();
     } catch (_) {
       setState(() => _error = 'Could not load this incident.');
+    }
+  }
+
+  void _startPolling() {
+    _pollTimer = Timer.periodic(const Duration(seconds: 15), (_) async {
+      if (!mounted) return;
+      final current = _incident;
+      if (current != null && _terminalStatuses.contains(current.status)) {
+        _pollTimer?.cancel();
+        return;
+      }
+      try {
+        final inc = await ref.read(incidentsServiceProvider).getOne(widget.incidentId);
+        if (mounted) setState(() => _incident = inc);
+      } catch (_) {}
+    });
+  }
+
+  Future<void> _cancelIncident() async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (_) => AlertDialog(
+        title: const Text('Cancel request?'),
+        content: const Text('Are you sure you want to cancel this assistance request?'),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(context, false), child: const Text('Keep')),
+          TextButton(
+            onPressed: () => Navigator.pop(context, true),
+            style: TextButton.styleFrom(foregroundColor: RsColors.emergency),
+            child: const Text('Cancel request'),
+          ),
+        ],
+      ),
+    );
+    if (confirmed != true) return;
+    setState(() => _cancelling = true);
+    try {
+      await ref.read(incidentsServiceProvider).cancel(widget.incidentId);
+      if (!mounted) return;
+      context.pop();
+    } catch (_) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Could not cancel. Please try again.')),
+      );
+    } finally {
+      if (mounted) setState(() => _cancelling = false);
     }
   }
 
@@ -131,6 +188,24 @@ class _IncidentStatusScreenState extends ConsumerState<IncidentStatusScreen> {
             _SearchingCard(),
           const SizedBox(height: 16),
           _DetailsCard(incident: inc),
+          if (_cancellableStatuses.contains(inc.status)) ...[
+            const SizedBox(height: 8),
+            OutlinedButton(
+              onPressed: _cancelling ? null : _cancelIncident,
+              style: OutlinedButton.styleFrom(
+                foregroundColor: RsColors.emergency,
+                side: const BorderSide(color: RsColors.emergency),
+                padding: const EdgeInsets.symmetric(vertical: 14),
+              ),
+              child: _cancelling
+                  ? const SizedBox(
+                      height: 18,
+                      width: 18,
+                      child: CircularProgressIndicator(strokeWidth: 2, color: RsColors.emergency),
+                    )
+                  : const Text('Cancel Request'),
+            ),
+          ],
         ],
       ),
     );
@@ -141,7 +216,7 @@ class _Stepper extends StatelessWidget {
   const _Stepper({required this.status});
   final String status;
 
-  static const _steps = ['ANALYZING', 'ASSIGNED', 'EN_ROUTE', 'ARRIVED', 'COMPLETED'];
+  static const _steps = ['REPORTED', 'ASSIGNED', 'EN_ROUTE', 'ARRIVED', 'COMPLETED'];
 
   @override
   Widget build(BuildContext context) {

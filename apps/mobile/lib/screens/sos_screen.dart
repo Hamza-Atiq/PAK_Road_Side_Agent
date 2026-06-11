@@ -35,7 +35,7 @@ class _SosScreenState extends ConsumerState<SosScreen> {
     ('🛞', 'tire', 'Flat tire', 'Change or repair'),
     ('⛽', 'fuel', 'Fuel', 'Out of gas'),
     ('🔑', 'lockout', 'Lockout', 'Keys locked in'),
-    ('🆘', 'other', 'Other', 'Describe the issue'),
+    ('🔧', 'other', 'Other', 'Describe the issue'),
   ];
 
   @override
@@ -111,7 +111,7 @@ class _SosScreenState extends ConsumerState<SosScreen> {
             image: _image,
           );
       if (!mounted) return;
-      context.go('/incidents/$id');
+      context.push('/incidents/$id');
     } catch (_) {
       setState(() => _error =
           'Couldn\'t send your report. Check your connection and try again.');
@@ -123,7 +123,7 @@ class _SosScreenState extends ConsumerState<SosScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Get help')),
+      appBar: AppBar(title: const Text('Request Assistance')),
       body: SafeArea(
         child: ListView(
           padding: const EdgeInsets.all(16),
@@ -230,7 +230,7 @@ class _SosScreenState extends ConsumerState<SosScreen> {
                           strokeWidth: 2, color: Colors.white),
                     )
                   : const Text(
-                      'Send SOS',
+                      'Request Help',
                       style: TextStyle(fontSize: 18, fontWeight: FontWeight.w700),
                     ),
             ),

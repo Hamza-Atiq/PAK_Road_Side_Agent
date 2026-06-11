@@ -17,12 +17,12 @@ class HomeScreen extends ConsumerWidget {
         actions: [
           IconButton(
             tooltip: 'History',
-            onPressed: () => context.go('/history'),
+            onPressed: () => context.push('/history'),
             icon: const Icon(Icons.history),
           ),
           IconButton(
             tooltip: 'Profile',
-            onPressed: () => context.go('/profile'),
+            onPressed: () => context.push('/profile'),
             icon: const Icon(Icons.person_outline),
           ),
         ],
@@ -49,7 +49,7 @@ class HomeScreen extends ConsumerWidget {
               Expanded(
                 child: Center(
                   child: GestureDetector(
-                    onTap: () => context.go('/sos'),
+                    onTap: () => context.push('/sos'),
                     child: Container(
                       width: 240,
                       height: 240,
@@ -68,20 +68,21 @@ class HomeScreen extends ConsumerWidget {
                         child: Column(
                           mainAxisSize: MainAxisSize.min,
                           children: [
-                            Text('🆘', style: TextStyle(fontSize: 64)),
-                            SizedBox(height: 6),
+                            Text('🚗', style: TextStyle(fontSize: 60)),
+                            SizedBox(height: 8),
                             Text(
-                              'SOS',
+                              'Get Help',
                               style: TextStyle(
                                 color: Colors.white,
-                                fontSize: 30,
+                                fontSize: 26,
                                 fontWeight: FontWeight.w800,
-                                letterSpacing: 2,
+                                letterSpacing: 1,
                               ),
                             ),
+                            SizedBox(height: 2),
                             Text(
-                              'Tap to report',
-                              style: TextStyle(color: Colors.white70, fontSize: 13),
+                              'Tap to request assistance',
+                              style: TextStyle(color: Colors.white70, fontSize: 12),
                             ),
                           ],
                         ),

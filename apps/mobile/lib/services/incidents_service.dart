@@ -44,4 +44,8 @@ class IncidentsService {
     final items = (r.data['items'] as List).cast<Map<String, dynamic>>();
     return items.map(Incident.fromJson).toList();
   }
+
+  Future<void> cancel(String id) async {
+    await _api.dio.put('/api/incidents/$id/close', data: {'reason': 'cancelled by customer'});
+  }
 }

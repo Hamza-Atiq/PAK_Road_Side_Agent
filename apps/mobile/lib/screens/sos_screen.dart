@@ -2,6 +2,7 @@
 
 import 'dart:io';
 
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -112,9 +113,29 @@ class _SosScreenState extends ConsumerState<SosScreen> {
           );
       if (!mounted) return;
       context.push('/incidents/$id');
-    } catch (_) {
-      setState(() => _error =
-          'Couldn\'t send your report. Check your connection and try again.');
+    } catch (e) {
+      String msg;
+      if (e is DioException) {
+        if (e.response?.statusCode == 401) {
+          if (mounted) context.go('/login');
+          return;
+        } else if (e.type == DioExceptionType.connectionError ||
+            e.type == DioExceptionType.unknown) {
+          msg = 'Cannot reach server. Check your internet connection.';
+        } else if (e.response != null) {
+          final detail = e.response?.data is Map
+              ? e.response?.data['detail']
+              : null;
+          msg = detail != null
+              ? detail.toString()
+              : 'Request failed (${e.response!.statusCode}).';
+        } else {
+          msg = 'Request failed: ${e.message ?? e.type.name}';
+        }
+      } else {
+        msg = e.toString().replaceFirst('Exception: ', '');
+      }
+      setState(() => _error = msg);
     } finally {
       if (mounted) setState(() => _submitting = false);
     }

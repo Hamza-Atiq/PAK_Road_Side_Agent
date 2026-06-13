@@ -41,7 +41,7 @@ export function useWebSocket({ path, enabled = true, onEvent }: Options) {
       const wsBase =
         import.meta.env.VITE_WS_BASE_URL ||
         (location.protocol === "https:" ? "wss" : "ws") + "://" + location.host;
-      const url = `${wsBase}${path}?token=${encodeURIComponent(token)}`;
+      const url = `${wsBase.replace(/\/$/, '')}${path}?token=${encodeURIComponent(token)}`;
       const ws = new WebSocket(url);
       wsRef.current = ws;
       ws.onopen = () => {

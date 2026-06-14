@@ -196,13 +196,18 @@ async def assign_provider_to_incident(
 
 
 async def release_provider_availability(
-    db: AsyncSession, *, provider_id: uuid.UUID
+    db: AsyncSession, *, provider_id: uuid.UUID, mark_available: bool = True
 ) -> None:
-    """Mark a provider available again after a job completes or is reassigned."""
+    """Release a provider after a job ends.
+
+    mark_available=True  → job completed/reassigned normally; put back in pool.
+    mark_available=False → provider went offline; keep them out of the pool
+                           until they toggle back online themselves.
+    """
     provider = await db.get(Provider, provider_id)
     if provider is None:
         raise DbWriteError(f"provider {provider_id} not found")
-    provider.is_available = True
+    provider.is_available = mark_available
     await db.flush()
 
 

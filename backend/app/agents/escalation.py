@@ -192,10 +192,17 @@ class EscalationAgent(BaseAgent[EscalationOutcome]):
             provider_offline_detections_total.inc()
         old_provider_id = incident.provider_id
 
-        # 1. Release the old provider so they're back in the pool (or stay offline naturally)
+        # 1. Release the old provider.
+        # If they went offline, mark them unavailable so re-dispatch doesn't
+        # immediately re-assign the same unreachable provider (infinite loop fix).
         if old_provider_id is not None:
             try:
-                await release_provider_availability(context.db, provider_id=old_provider_id)
+                mark_available = reason != EscalationReason.PROVIDER_OFFLINE
+                await release_provider_availability(
+                    context.db,
+                    provider_id=old_provider_id,
+                    mark_available=mark_available,
+                )
             except DbWriteError as exc:
                 log.warning("release_old_provider_failed",
                             provider_id=str(old_provider_id), error=str(exc))

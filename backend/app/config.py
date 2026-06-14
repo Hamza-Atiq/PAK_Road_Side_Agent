@@ -89,7 +89,7 @@ class Settings(BaseSettings):
     # ---------- Dispatch policy ----------
     DISPATCH_INITIAL_RADIUS_KM: float = 50.0
     DISPATCH_MAX_RADIUS_KM: float = 100.0
-    PROVIDER_OFFLINE_THRESHOLD_SECONDS: int = 90
+    PROVIDER_OFFLINE_THRESHOLD_SECONDS: int = 300
     ASSIGNED_TIMEOUT_MINUTES: int = 60
     EN_ROUTE_TIMEOUT_MINUTES: int = 180
 

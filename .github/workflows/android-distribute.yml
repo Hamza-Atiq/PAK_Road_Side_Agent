@@ -83,5 +83,6 @@ jobs:
           serviceCredentialsFileContent: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
           groups: testers
           file: apps/mobile/build/app/outputs/flutter-apk/app-release.apk
+          debug: true
           releaseNotes: |
             Automated build ${{ steps.version.outputs.tag }} from commit ${{ github.sha }}.
